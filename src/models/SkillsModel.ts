@@ -12,8 +12,10 @@ export const SkillsDocSchema = new Schema<ISkillsDoc>({
   imageUrl: { type: String, required: true },
 });
 
-export const RequestDocModel = mongoose.model(
-  'Skills',
+SkillsDocSchema.index({ name: 1 }, { unique: true });
+
+export const SkillsDocModel = mongoose.model(
+  'Skill',
   SkillsDocSchema,
   'Skills'
 );
