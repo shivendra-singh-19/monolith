@@ -1,16 +1,13 @@
-import fs from 'fs';
 import Bluebird from 'bluebird';
+import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
+import fs from 'fs';
+
 import { RequestRouter } from './api/request/routes';
+import { SkillsRouter } from './api/skills/routes';
+import { CustomerAccountsRouter } from './api/users/routes';
 import { MongoConnect } from './setup/MongoConnect';
 import { RedisConnect } from './setup/RedisConnect';
-import {
-  AuthenticationError,
-  AuthorizationError,
-  NotFoundError,
-  ValidationError,
-} from './error/Errors';
-import { SkillsRouter } from './api/skills/routes';
 
 global.Promise = <any>Bluebird;
 
@@ -33,9 +30,13 @@ async function init() {
 
   app.use(express.json());
 
+  app.use(cors());
+
   app.get('/health', (req: Request, res: Response) => {
     res.send('Running');
   });
+
+  app.use('/user', CustomerAccountsRouter);
 
   app.use('/skill', SkillsRouter);
 
