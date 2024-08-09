@@ -1,16 +1,16 @@
 import mongoose, { Schema } from 'mongoose';
 
 export type ICustomerAccounts = {
-  email: string;
+  username: string;
   passwordHash: string;
 };
 
 const CustomAccountsSchema = new Schema<ICustomerAccounts>({
-  email: { type: String, required: true },
-  passwordHash: { type: String },
+  username: { type: String, required: true },
+  passwordHash: { type: String, required: true },
 });
 
-CustomAccountsSchema.index({ email: 1 }, { unique: true });
+CustomAccountsSchema.index({ username: 1 }, { unique: true });
 
 export const CustomAccountsModel = mongoose.model(
   'CustomerAccount',
