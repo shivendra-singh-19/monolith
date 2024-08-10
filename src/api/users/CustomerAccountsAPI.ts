@@ -55,9 +55,27 @@ export class CustomerAccountsAPI {
      */
     const user = { username };
 
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '15s',
+    });
+
+    const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
     return {
       accessToken,
+      refreshToken,
+    };
+  }
+
+  /**
+   * Creating test API for fetching user
+   * @param object
+   * @param options
+   * @returns
+   */
+  static async fetchUser(object, options) {
+    const { user } = options;
+    return {
+      user,
     };
   }
 }

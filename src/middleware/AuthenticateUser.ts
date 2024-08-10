@@ -11,6 +11,9 @@ export const authenticateUser = (
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) {
+    /**
+     * Sending 401 for missing token
+     */
     throw new AuthenticationError({
       message: `Authorization token missing.`,
     });
