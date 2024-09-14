@@ -8,6 +8,7 @@ import { SkillsRouter } from './api/skills/routes';
 import { CustomerAccountsRouter } from './api/users/routes';
 import { MongoConnect } from './setup/MongoConnect';
 import { RedisConnect } from './setup/RedisConnect';
+import { ScheduledJobsRouter } from './api/scheduler/routes';
 
 global.Promise = <any>Bluebird;
 
@@ -42,6 +43,8 @@ async function init() {
 
   app.use('/request', RequestRouter);
 
+  app.use('/job', ScheduledJobsRouter);
+
   // Error handling middleware
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err.name == 'ValidationError') {
@@ -74,4 +77,5 @@ try {
   init();
 } catch (error) {
   console.error(error);
+  process.exit(-1);
 }
