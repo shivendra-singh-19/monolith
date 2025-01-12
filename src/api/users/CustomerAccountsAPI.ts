@@ -6,7 +6,7 @@ import {
   ICustomerAccounts,
 } from '../../models/CustomerAccountsModel';
 import { GeneralUtils } from '../../utils/GeneralUtils';
-import { UserUtils } from '../../utils/UserUtils';
+// import { UserUtils } from '../../utils/UserUtils';
 
 require('dotenv').config();
 
@@ -22,10 +22,10 @@ export class CustomerAccountsAPI {
 
     const { username, password } = object;
 
-    const encryptedPassword = await UserUtils.encryptPlainText(password);
+    // const encryptedPassword = await UserUtils.encryptPlainText(password);
     const pushBody: ICustomerAccounts = {
       username,
-      passwordHash: encryptedPassword,
+      passwordHash: password,
     };
     const user = await new CustomAccountsModel(pushBody).save();
     return {
