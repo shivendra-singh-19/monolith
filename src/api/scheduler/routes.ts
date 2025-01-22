@@ -6,4 +6,6 @@ export const ScheduledJobsRouter = express.Router();
 
 ScheduledJobsRouter.post('/', api.http(SchedulerApi.addJob));
 
+ScheduledJobsRouter.post('/bullmq', api.http(SchedulerApi.addJobToBullMq));
+
 ScheduledJobsRouter.post('/bench', api.http(SchedulerApi.add10kJobs));

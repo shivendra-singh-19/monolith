@@ -2,6 +2,16 @@ import Queue from 'bull';
 import { addMinutes, addSeconds, getTime } from 'date-fns';
 import dotenv from 'dotenv';
 import { RedisOptions } from 'ioredis';
+import { QueueInstance } from '../../QueueInstance';
+import { redisClient } from '../..';
+import { QueueEvents } from 'bullmq';
+
+// Redis connection
+const redisConnection = {
+  host: 'localhost',
+  port: 6379,
+};
+
 dotenv.config();
 
 const redisOptions: RedisOptions = {
@@ -54,6 +64,35 @@ export class SchedulerApi {
 
     return {
       message: 'Added 1 test job to queue',
+    };
+  }
+
+  static async addJobToBullMq(object, options) {
+    const refreshQueue = QueueInstance.getInstance('audience_refresh');
+
+    const job = await refreshQueue.addBulk([
+      {
+        name: 'audience_refresh',
+        data: { ...object },
+        opts: { delay: 15, removeOnComplete: true, removeOnFail: true },
+      },
+      {
+        name: 'audience_refresh',
+        data: { ...object },
+        opts: { delay: 10, removeOnComplete: true, removeOnFail: true },
+      },
+      {
+        name: 'audience_refresh',
+        data: { ...object },
+        opts: { delay: 2, removeOnComplete: true, removeOnFail: true },
+      },
+    ]);
+
+    const events = new QueueEvents('audience_refresh');
+    const result = await Promise.all([job[0].waitUntilFinished(events)]);
+    return {
+      message: 'Pushed to queue',
+      result,
     };
   }
 }

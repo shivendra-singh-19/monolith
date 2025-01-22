@@ -23,11 +23,14 @@ export const config = JSON.parse(configFile);
 const { server, database, redis } = config;
 const { port } = server;
 
+export let redisClient;
 async function init() {
-  await Promise.all([
+  const [mongo, redisClient1] = await Promise.all([
     MongoConnect.connect(database),
     RedisConnect.connect(redis),
   ]);
+
+  redisClient = redisClient1;
 
   const app = express();
   const httpServer = http.createServer(app);
