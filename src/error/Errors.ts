@@ -48,3 +48,13 @@ export class AuthorizationError extends BaseError {
     });
   }
 }
+
+export class InternalServerError extends BaseError {
+  constructor(details: any) {
+    super({
+      message: 'Internal Server Error',
+      code: 'INTERNAL_SERVER_ERROR',
+      details,
+    });
+  }
+}

@@ -1,13 +1,16 @@
-import Bluebird from 'bluebird';
-import cors from 'cors';
-import express, { NextFunction, Request, Response } from 'express';
 import fs from 'fs';
+import cors from 'cors';
+import Bluebird from 'bluebird';
+import { Server } from 'socket.io';
+import http from 'http';
+import express, { NextFunction, Request, Response } from 'express';
 
-import { RequestRouter } from './api/request/routes';
 import { SkillsRouter } from './api/skills/routes';
-import { CustomerAccountsRouter } from './api/users/routes';
-import { MongoConnect } from './setup/MongoConnect';
 import { RedisConnect } from './setup/RedisConnect';
+import { MongoConnect } from './setup/MongoConnect';
+import { RequestRouter } from './api/request/routes';
+import { CustomerAccountsRouter } from './api/users/routes';
+import { ScheduledJobsRouter } from './api/scheduler/routes';
 
 global.Promise = <any>Bluebird;
 
@@ -20,13 +23,23 @@ export const config = JSON.parse(configFile);
 const { server, database, redis } = config;
 const { port } = server;
 
+export let redisClient;
 async function init() {
-  await Promise.all([
+  const [mongo, redisClient1] = await Promise.all([
     MongoConnect.connect(database),
     RedisConnect.connect(redis),
   ]);
 
+  redisClient = redisClient1;
+
   const app = express();
+  const httpServer = http.createServer(app);
+
+  const io = new Server(httpServer);
+
+  io.on('connection', (socket) => {
+    console.log(`Socket connected id: ${socket.id}`);
+  });
 
   app.use(express.json());
 
@@ -41,6 +54,8 @@ async function init() {
   app.use('/skill', SkillsRouter);
 
   app.use('/request', RequestRouter);
+
+  app.use('/job', ScheduledJobsRouter);
 
   // Error handling middleware
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -74,4 +89,5 @@ try {
   init();
 } catch (error) {
   console.error(error);
+  process.exit(-1);
 }

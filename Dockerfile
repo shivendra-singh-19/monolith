@@ -1,10 +1,20 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
-WORKDIR /app
+ENV PROJECT_HOME=/usr/app/
 
-COPY . /app
+# RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+USER node
 
-RUN npm install
+WORKDIR ${PROJECT_HOME}
+
+COPY --chown=node:node package*.json ${PROJECT_HOME}
+
+RUN  npm install --only-production \
+    && chown -R node:node .
+
+COPY --chown=node:node . $PROJECT_HOME
+
+RUN npm run build
 
 EXPOSE 8080
 
