@@ -6,16 +6,6 @@ import { authenticateUser } from '../../middleware/AuthenticateUser';
 
 export const CustomerAccountsRouter = express.Router();
 
-CustomerAccountsRouter.post(
-  '/sign-up',
-  authenticateUser,
-  api.http(CustomerAccountsAPI.createUser)
-);
+CustomerAccountsRouter.post('/sign-up', api.http(CustomerAccountsAPI.signup));
 
-CustomerAccountsRouter.post('/login', api.http(CustomerAccountsAPI.loginUser));
-
-CustomerAccountsRouter.get(
-  '/',
-  authenticateUser,
-  api.http(CustomerAccountsAPI.fetchUser)
-);
+CustomerAccountsRouter.post('/login', api.http(CustomerAccountsAPI.login));

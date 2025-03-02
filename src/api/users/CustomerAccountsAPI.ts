@@ -1,17 +1,23 @@
 import Joi from 'joi';
-import jwt from 'jsonwebtoken';
 
 import {
   CustomAccountsModel,
   ICustomerAccounts,
 } from '../../models/CustomerAccountsModel';
 import { GeneralUtils } from '../../utils/GeneralUtils';
-// import { UserUtils } from '../../utils/UserUtils';
 
 require('dotenv').config();
 
+const cache = {};
+
 export class CustomerAccountsAPI {
-  static async createUser(object, options) {
+  /**
+   * Verify user login
+   * @param object
+   * @param options
+   * @returns
+   */
+  static async login(object, options) {
     await GeneralUtils.validateBody(
       object,
       Joi.object({
@@ -21,60 +27,53 @@ export class CustomerAccountsAPI {
     );
 
     const { username, password } = object;
+    const user = await CustomAccountsModel.findOne({
+      username,
+      passwordHash: password,
+    })
+      .lean()
+      .exec();
 
-    // const encryptedPassword = await UserUtils.encryptPlainText(password);
+    if (!user) {
+      return {
+        isValid: false,
+      };
+    }
+
+    return {
+      isValid: true,
+      user,
+    };
+  }
+
+  /**
+   * Signing up new user
+   * @param object
+   * @param options
+   * @returns
+   */
+  static async signup(object, options) {
+    await GeneralUtils.validateBody(
+      object,
+      Joi.object({
+        email: Joi.string().required(),
+        name: Joi.string().required(),
+        username: Joi.string().required(),
+        password: Joi.string().required(),
+      })
+    );
+
+    const { email, name, username, password } = object;
     const pushBody: ICustomerAccounts = {
+      email,
+      name,
       username,
       passwordHash: password,
     };
+
     const user = await new CustomAccountsModel(pushBody).save();
     return {
-      message: 'User saved successfully',
-    };
-  }
-
-  /**
-   * To verify and login user
-   * @param object
-   * @param options
-   * @returns
-   */
-  static async loginUser(object, options) {
-    await GeneralUtils.validateBody(
-      object,
-      Joi.object({
-        username: Joi.string().required(),
-        password: Joi.string().required(),
-      })
-    );
-
-    const { username, password } = object;
-    /**
-     * To-do
-     * Verification of username and password if they exist in db
-     */
-    const user = { username };
-
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '15s',
-    });
-
-    const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
-    return {
-      accessToken,
-      refreshToken,
-    };
-  }
-
-  /**
-   * Creating test API for fetching user
-   * @param object
-   * @param options
-   * @returns
-   */
-  static async fetchUser(object, options) {
-    const { user } = options;
-    return {
+      message: 'User creation successfull',
       user,
     };
   }

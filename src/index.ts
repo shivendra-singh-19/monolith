@@ -35,10 +35,20 @@ async function init() {
   const app = express();
   const httpServer = http.createServer(app);
 
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: 'http://localhost:5173',
+    },
+  });
 
   io.on('connection', (socket) => {
     console.log(`Socket connected id: ${socket.id}`);
+    socket.on(
+      'message',
+      (message: { sender: string; receiver: string; message: string }) => {
+        io.emit('message', message);
+      }
+    );
   });
 
   app.use(express.json());
@@ -80,7 +90,7 @@ async function init() {
     }
   });
 
-  app.listen(port, (): void => {
+  httpServer.listen(port, (): void => {
     console.log(`Server Running at ${port}`);
   });
 }
