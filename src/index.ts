@@ -11,6 +11,7 @@ import { MongoConnect } from './setup/MongoConnect';
 import { RequestRouter } from './api/request/routes';
 import { CustomerAccountsRouter } from './api/users/routes';
 import { ScheduledJobsRouter } from './api/scheduler/routes';
+import { startConsumers } from './amq';
 
 global.Promise = <any>Bluebird;
 
@@ -31,6 +32,8 @@ async function init() {
   ]);
 
   redisClient = redisClient1;
+
+  await startConsumers();
 
   const app = express();
   const httpServer = http.createServer(app);
