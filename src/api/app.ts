@@ -21,9 +21,8 @@ export const api = {
         const result = await handler(object, options);
         res.json(result);
       } catch (error) {
-        throw new InternalServerError({
-          details: JSON.parse(JSON.stringify(error)),
-        });
+        console.error(error.details);
+        res.sendStatus(500);
       }
     };
   },

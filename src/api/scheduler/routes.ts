@@ -4,8 +4,28 @@ import { SchedulerApi } from './SchedulerApi';
 
 export const ScheduledJobsRouter = express.Router();
 
-ScheduledJobsRouter.post('/', api.http(SchedulerApi.addJob));
+// Test Direct Exchange
+ScheduledJobsRouter.post(
+  '/test/direct-exchange',
+  api.http(SchedulerApi.testDirectExchange)
+);
 
-ScheduledJobsRouter.post('/bullmq', api.http(SchedulerApi.addJobToBullMq));
+// Test Fanout Exchange
+ScheduledJobsRouter.post(
+  '/test/fanout-exchange',
+  api.http(SchedulerApi.testFanoutExchange)
+);
 
-ScheduledJobsRouter.post('/bench', api.http(SchedulerApi.add10kJobs));
+// Test Topic Exchange
+ScheduledJobsRouter.post(
+  '/test/topic-exchange',
+  api.http(SchedulerApi.testTopicExchange)
+);
+
+// Test Headers Exchange
+ScheduledJobsRouter.post(
+  '/test/headers-exchange',
+  api.http(SchedulerApi.testHeadersExchange)
+);
+
+ScheduledJobsRouter.post('/', api.http(SchedulerApi.createNewMessage));

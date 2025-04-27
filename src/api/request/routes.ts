@@ -10,3 +10,5 @@ RequestRouter.get('/', api.http(RequestsApi.fetchAllRequests));
 RequestRouter.post('/', api.http(RequestsApi.createNewRequest));
 
 RequestRouter.put('/:requestId', api.http(RequestsApi.updateUserRequest));
+
+RequestRouter.get('/large-data', api.http(RequestsApi.fetchLargeData));

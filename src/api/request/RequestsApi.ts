@@ -2,8 +2,11 @@ import Joi from 'joi';
 
 import { IRequestDoc, RequestDocModel } from '../../models/RequestModel';
 import { GeneralUtils } from '../../utils/GeneralUtils';
+import axios from 'axios';
 
 export const MAX_PAGE_LIMIT = 4;
+
+const cache = {};
 
 export class RequestsApi {
   /**
@@ -153,6 +156,30 @@ export class RequestsApi {
     return {
       message: 'Deletion Successfull',
       request: updatedRequest,
+    };
+  }
+
+  /**
+   * Implementing caching
+   * @param object
+   * @param options
+   * @returns
+   */
+  static async fetchLargeData(object, options) {
+    if (cache['largeData']) {
+      return {
+        message: cache['largeData'],
+      };
+    }
+
+    const { data } = await axios.get(
+      'https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=Barack_Obama&rvprop=content'
+    );
+
+    cache['largeData'] = data;
+
+    return {
+      message: data,
     };
   }
 }

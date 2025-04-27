@@ -11,6 +11,7 @@ import { MongoConnect } from './setup/MongoConnect';
 import { RequestRouter } from './api/request/routes';
 import { CustomerAccountsRouter } from './api/users/routes';
 import { ScheduledJobsRouter } from './api/scheduler/routes';
+import { startConsumers } from './amq';
 
 global.Promise = <any>Bluebird;
 
@@ -32,13 +33,25 @@ async function init() {
 
   redisClient = redisClient1;
 
+  await startConsumers();
+
   const app = express();
   const httpServer = http.createServer(app);
 
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: 'http://localhost:5173',
+    },
+  });
 
   io.on('connection', (socket) => {
     console.log(`Socket connected id: ${socket.id}`);
+    socket.on(
+      'message',
+      (message: { sender: string; receiver: string; message: string }) => {
+        io.emit('message', message);
+      }
+    );
   });
 
   app.use(express.json());
@@ -80,7 +93,7 @@ async function init() {
     }
   });
 
-  app.listen(port, (): void => {
+  httpServer.listen(port, (): void => {
     console.log(`Server Running at ${port}`);
   });
 }
