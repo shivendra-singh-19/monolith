@@ -1,1 +1,1 @@
-sudo docker build -t mono .
+yarn build

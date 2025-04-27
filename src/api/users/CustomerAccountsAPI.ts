@@ -5,6 +5,7 @@ import {
   ICustomerAccounts,
 } from '../../models/CustomerAccountsModel';
 import { GeneralUtils } from '../../utils/GeneralUtils';
+import axios from 'axios';
 
 require('dotenv').config();
 
@@ -39,6 +40,8 @@ export class CustomerAccountsAPI {
         isValid: false,
       };
     }
+
+    const { data } = await axios.get('');
 
     return {
       isValid: true,
